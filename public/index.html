@@ -390,6 +390,48 @@
             }
         }
 
+        .gate-card {
+            background: rgba(255,255,255,0.92);
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            padding: 32px 24px;
+            max-width: 560px;
+            display: grid;
+            gap: 18px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .countdown-chip {
+            background: rgba(255,255,255,0.82);
+            border: 1px solid rgba(255, 79, 123, 0.12);
+            border-radius: 18px;
+            padding: 14px 8px;
+        }
+
+        .countdown-number {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent-dark);
+        }
+
+        .countdown-label {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
         .error-screen {
             width: min(720px, 100%);
             background: #151923;
@@ -594,6 +636,10 @@
 
             .memory-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .countdown-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
 
@@ -944,6 +990,69 @@
             return Math.round((state.currentPage / state.totalPages) * 100);
         }
 
+        function getUnlockDate() {
+            return new Date('2026-05-25T00:00:00-05:00');
+        }
+
+        function isUnlocked(now = new Date()) {
+            return now.getTime() >= getUnlockDate().getTime();
+        }
+
+        function getCountdownParts(now = new Date()) {
+            const diff = Math.max(0, getUnlockDate().getTime() - now.getTime());
+            const days = Math.floor(diff / 86400000);
+            const hours = Math.floor((diff % 86400000) / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            return { days, hours, minutes, seconds, diff };
+        }
+
+        function renderGatePage() {
+            const { days, hours, minutes, seconds } = getCountdownParts();
+            app.innerHTML = `
+                <section class="gate-card">
+                    <span class="eyebrow">🎁 Anniversary surprise locked</span>
+                    <div class="hero-photo-wrap">
+                        <figure class="hero-photo">
+                            <img src="./assets/couple-photo.jpg" alt="William and Kristin smiling together on their wedding day">
+                            <figcaption class="hero-photo-caption">Worth waiting one more day for.</figcaption>
+                        </figure>
+                    </div>
+                    <div>
+                        <h1>Not yet, pretty girl ❤️</h1>
+                        <p class="subtitle">
+                            This surprise unlocks on <strong>May 25</strong> in your local time near Windsor, Missouri (65360).
+                            Until then, the app is under strict romance quarantine.
+                        </p>
+                    </div>
+                    <div class="countdown-grid" id="countdownGrid">
+                        <div class="countdown-chip"><span class="countdown-number">${days}</span><span class="countdown-label">Days</span></div>
+                        <div class="countdown-chip"><span class="countdown-number">${hours}</span><span class="countdown-label">Hours</span></div>
+                        <div class="countdown-chip"><span class="countdown-number">${minutes}</span><span class="countdown-label">Minutes</span></div>
+                        <div class="countdown-chip"><span class="countdown-number">${seconds}</span><span class="countdown-label">Seconds</span></div>
+                    </div>
+                    <p class="footer-note">Come back on May 25 and this gift will open automatically.</p>
+                </section>
+            `;
+
+            clearInterval(renderGatePage.timer);
+            renderGatePage.timer = setInterval(() => {
+                if (isUnlocked()) {
+                    clearInterval(renderGatePage.timer);
+                    renderIntro();
+                    return;
+                }
+                const next = getCountdownParts();
+                const nums = app.querySelectorAll('.countdown-number');
+                if (nums.length === 4) {
+                    nums[0].textContent = next.days;
+                    nums[1].textContent = next.hours;
+                    nums[2].textContent = next.minutes;
+                    nums[3].textContent = next.seconds;
+                }
+            }, 1000);
+        }
+
         function renderIntro() {
             app.innerHTML = `
                 <section class="card">
@@ -1141,7 +1250,11 @@
         }
 
         spawnHearts();
-        renderIntro();
+        if (isUnlocked()) {
+            renderIntro();
+        } else {
+            renderGatePage();
+        }
     </script>
 </body>
 </html>
