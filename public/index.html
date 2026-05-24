@@ -363,6 +363,33 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        .mini-burst {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 9;
+        }
+
+        .mini-burst span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 1.2rem;
+            animation: burstOut 700ms ease forwards;
+        }
+
+        @keyframes burstOut {
+            from {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.7);
+            }
+            to {
+                opacity: 0;
+                transform: translate(var(--dx), var(--dy)) scale(1.4) rotate(var(--rot));
+            }
+        }
+
         .error-screen {
             width: min(720px, 100%);
             background: #151923;
@@ -589,6 +616,23 @@
         const toast = document.getElementById('toast');
         const hearts = document.getElementById('hearts');
 
+        function miniBurst(symbols = ['💖','✨','💘','💕']) {
+            const layer = document.createElement('div');
+            layer.className = 'mini-burst';
+            document.body.appendChild(layer);
+            for (let i = 0; i < 10; i += 1) {
+                const item = document.createElement('span');
+                item.textContent = symbols[i % symbols.length];
+                item.style.setProperty('--dx', `${Math.random() * 220 - 110}px`);
+                item.style.setProperty('--dy', `${Math.random() * 220 - 110}px`);
+                item.style.setProperty('--rot', `${Math.random() * 70 - 35}deg`);
+                item.style.left = `${45 + Math.random() * 10}%`;
+                item.style.top = `${40 + Math.random() * 16}%`;
+                layer.appendChild(item);
+            }
+            setTimeout(() => layer.remove(), 760);
+        }
+
         const state = {
             currentPage: 0,
             yesScale: 1,
@@ -604,7 +648,9 @@
                 'System note: true love confirmed, but we need one more tap.',
                 'Tiny glitch. Huge feelings. Continuing...',
                 'Romance sensors overloaded. Running another check...',
-                'That looked correct, but the app is being dramatic about it.'
+                'That looked correct, but the app is being dramatic about it.',
+                'Committee review: adorable, but not approved yet.',
+                'The app gasped, blushed, and requested another confirmation.'
             ]
         };
 
@@ -652,6 +698,7 @@
                             yesBtn.style.left = 'auto';
                             yesBtn.style.top = 'auto';
                             yesBtn.style.transform = 'none';
+                            miniBurst(['😌','💞','✨']);
                             setMessage('Alright, alright. The button has stopped running.');
                             return;
                         }
@@ -700,6 +747,7 @@
                             yesBtn.removeEventListener('pointerenter', swap);
                             yesBtn.removeEventListener('touchstart', swap);
                             yesBtn.textContent = 'Even more';
+                            miniBurst(['😇','💘','✨']);
                             setMessage('The buttons are done being dramatic.');
                         }
                     };
@@ -729,6 +777,7 @@
                             yesBtn.removeEventListener('pointerenter', pulseAway);
                             yesBtn.removeEventListener('touchstart', pulseAway);
                             yesBtn.style.transform = 'none';
+                            miniBurst(['🎯','💖','✨']);
                             setMessage('Celebration mode can no longer be delayed.');
                         }
                     };
@@ -761,6 +810,7 @@
                             yesBtn.removeEventListener('touchstart', tilt);
                             yesBtn.style.transform = 'none';
                             yesBtn.textContent = 'Keep him';
+                            miniBurst(['🛏️','💕','✨']);
                             setMessage('Compromise reached. Proceed.');
                         }
                     };
@@ -791,6 +841,7 @@
                             yesBtn.removeEventListener('touchstart', finalChaos);
                             yesBtn.style.transform = 'none';
                             noBtn.style.transform = 'none';
+                            miniBurst(['🥹','💍','💖','✨']);
                             setMessage('Official record accepted. Proceed with romance.');
                         }
                     };
@@ -947,6 +998,7 @@
                     'System override denied. Love is still winning.'
                 ];
                 showToast(lines[Math.floor(Math.random() * lines.length)], 2200);
+                if (Math.random() > 0.45) miniBurst(['😏','💗','✨','😂']);
             });
         }
 
@@ -981,6 +1033,7 @@
                     <span class="eyebrow">🥂 Happy Anniversary</span>
                     <div>
                         <h1 class="final-title">Happy Anniversary, Kristin ❤️</h1>
+                        <p class="subtitle" style="font-weight:700; color: var(--accent-dark);">You have officially defeated one extremely stubborn love app.</p>
                         <p class="subtitle">
                             William was always going to win this little game. You confirmed it repeatedly, under emotional pressure, button chaos, and a highly unreliable software stack.
                         </p>
