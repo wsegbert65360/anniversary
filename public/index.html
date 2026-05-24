@@ -42,7 +42,8 @@
             justify-content: center;
             align-items: center;
             padding: 24px;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             position: relative;
             text-align: center;
         }
@@ -520,18 +521,17 @@
         @media (max-width: 640px) {
             body {
                 padding: 16px;
-                align-items: stretch;
+                align-items: flex-start;
             }
 
             .shell {
                 max-width: none;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                display: block;
+                padding-bottom: 28px;
             }
 
             .card {
-                min-height: 100dvh;
+                min-height: auto;
                 border-radius: 24px;
                 padding: 22px 18px 28px;
                 justify-content: flex-start;
