@@ -325,6 +325,16 @@
             font-size: 0.95rem;
         }
 
+        .btn-no.ghosted {
+            opacity: 0.45;
+            transform: scale(0.94);
+        }
+
+        .btn-yes.fake-disabled {
+            opacity: 0.72;
+            filter: saturate(0.8);
+        }
+
         .footer-note {
             color: var(--muted);
             font-size: 0.84rem;
@@ -587,6 +597,7 @@
             totalPages: 6,
             promptsCleared: 0,
             chaosUnlocked: false,
+            fakeAcceptCount: 0,
             toasts: [
                 'Hmm. That answer looked suspicious. Retrying love verification...',
                 'Rechecking emotional honesty, please hold 💘',
@@ -605,7 +616,7 @@
                 note: 'Tap carefully. The app may be emotionally invested.',
                 yesLabel: 'Absolutely',
                 noLabel: 'Not sure',
-                setup: ({ yesBtn, setMessage }) => {
+                setup: ({ yesBtn, setMessage, flashFakeAccept }) => {
                     const dodge = (event) => {
                         event.preventDefault();
                         state.clickAttempts += 1;
@@ -631,10 +642,10 @@
                 note: 'The pink button is feeling shy.',
                 yesLabel: 'Very sure',
                 noLabel: 'Need loopholes',
-                setup: ({ yesBtn, card, setMessage }) => {
+                setup: ({ yesBtn, card, setMessage, flashFakeAccept }) => {
                     const teleport = (event) => {
                         event.preventDefault();
-                        if (state.clickAttempts >= 10) {
+                        if (state.clickAttempts >= 12) {
                             yesBtn.removeEventListener('pointerdown', teleport);
                             yesBtn.removeEventListener('touchstart', teleport);
                             yesBtn.style.position = 'relative';
@@ -645,6 +656,9 @@
                             return;
                         }
                         state.clickAttempts += 1;
+                        if (state.clickAttempts === 4 || state.clickAttempts === 8) {
+                            flashFakeAccept('Accepted... almost. Love verification failed dramatically.');
+                        }
                         const cardRect = card.getBoundingClientRect();
                         const maxX = Math.min(180, cardRect.width * 0.4);
                         const maxY = Math.min(150, cardRect.height * 0.28);
@@ -669,7 +683,7 @@
                 note: 'If the buttons start trading places, remain calm.',
                 yesLabel: 'Even more',
                 noLabel: 'No comment',
-                setup: ({ yesBtn, noBtn, setMessage }) => {
+                setup: ({ yesBtn, noBtn, setMessage, flashFakeAccept }) => {
                     const swap = (event) => {
                         event.preventDefault();
                         state.clickAttempts += 1;
@@ -678,8 +692,11 @@
                         yesBtn.style.transform = state.isSwapped ? `translateX(${distance}px) rotate(6deg)` : 'translateX(0) rotate(0deg)';
                         noBtn.style.transform = state.isSwapped ? `translateX(-${distance}px) rotate(-6deg)` : 'translateX(0) rotate(0deg)';
                         yesBtn.textContent = state.isSwapped ? 'Catch me' : 'Even more';
+                        if (state.clickAttempts === 5 || state.clickAttempts === 9) {
+                            flashFakeAccept('Lock acquired... then immediately lost. Classic romance software.');
+                        }
                         setMessage(state.isSwapped ? 'Those feelings have range.' : 'Love metrics destabilized again.');
-                        if (state.clickAttempts >= 8) {
+                        if (state.clickAttempts >= 11) {
                             yesBtn.removeEventListener('pointerenter', swap);
                             yesBtn.removeEventListener('touchstart', swap);
                             yesBtn.textContent = 'Even more';
@@ -697,15 +714,18 @@
                 note: 'Proceed only if you are prepared for romance-themed system instability.',
                 yesLabel: 'Without question',
                 noLabel: 'I plead the fifth',
-                setup: ({ yesBtn, setMessage }) => {
+                setup: ({ yesBtn, setMessage, flashFakeAccept }) => {
                     const pulseAway = (event) => {
                         event.preventDefault();
                         state.clickAttempts += 1;
                         const scale = state.clickAttempts % 2 === 0 ? 0.88 : 1.08;
                         const rotate = state.clickAttempts % 2 === 0 ? -5 : 5;
                         yesBtn.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
-                        setMessage(state.clickAttempts > 4 ? 'The answer is obvious, the app is just milking it.' : 'Warning: choosing correctly may unlock celebration mode.');
-                        if (state.clickAttempts >= 7) {
+                        if (state.clickAttempts === 3 || state.clickAttempts === 7) {
+                            flashFakeAccept('Celebration mode unlocked... pending one extremely unnecessary extra check.');
+                        }
+                        setMessage(state.clickAttempts > 5 ? 'The answer is obvious, the app is just milking it.' : 'Warning: choosing correctly may unlock celebration mode.');
+                        if (state.clickAttempts >= 10) {
                             yesBtn.removeEventListener('pointerenter', pulseAway);
                             yesBtn.removeEventListener('touchstart', pulseAway);
                             yesBtn.style.transform = 'none';
@@ -724,7 +744,7 @@
                 note: 'Blanket theft is not ideal, but neither is losing William.',
                 yesLabel: 'Keep him',
                 noLabel: 'File complaint',
-                setup: ({ yesBtn, setMessage }) => {
+                setup: ({ yesBtn, setMessage, flashFakeAccept }) => {
                     const tilt = (event) => {
                         event.preventDefault();
                         state.clickAttempts += 1;
@@ -732,8 +752,11 @@
                         const shift = state.clickAttempts % 2 === 0 ? -26 : 26;
                         yesBtn.style.transform = `translateX(${shift}px) rotate(${rotate}deg) scale(1.03)`;
                         yesBtn.textContent = state.clickAttempts % 2 === 0 ? 'Still him' : 'Keep him';
-                        setMessage(state.clickAttempts > 4 ? 'Marriage audit suggests forgiveness is extremely likely.' : 'Domestic negotiations detected.');
-                        if (state.clickAttempts >= 7) {
+                        if (state.clickAttempts === 4 || state.clickAttempts === 8) {
+                            flashFakeAccept('Blanket theft review complete. Verdict: still hopelessly in love. Rechecking anyway.');
+                        }
+                        setMessage(state.clickAttempts > 5 ? 'Marriage audit suggests forgiveness is extremely likely.' : 'Domestic negotiations detected.');
+                        if (state.clickAttempts >= 10) {
                             yesBtn.removeEventListener('pointerenter', tilt);
                             yesBtn.removeEventListener('touchstart', tilt);
                             yesBtn.style.transform = 'none';
@@ -752,15 +775,18 @@
                 note: 'Final answer. Maximum romance pressure.',
                 yesLabel: 'Every time',
                 noLabel: 'This seems rigged',
-                setup: ({ yesBtn, noBtn, setMessage }) => {
+                setup: ({ yesBtn, noBtn, setMessage, flashFakeAccept }) => {
                     const finalChaos = (event) => {
                         event.preventDefault();
                         state.clickAttempts += 1;
                         const offset = state.clickAttempts % 2 === 0 ? 60 : -60;
                         yesBtn.style.transform = `translateY(-6px) translateX(${offset}px) rotate(${offset > 0 ? 6 : -6}deg)`;
                         noBtn.style.transform = `translateX(${-offset}px)`;
-                        setMessage(state.clickAttempts > 5 ? 'Final review nearly complete. The app is being a menace on purpose.' : 'Final review in progress. Heart status appears extremely stable.');
-                        if (state.clickAttempts >= 9) {
+                        if (state.clickAttempts === 5 || state.clickAttempts === 10) {
+                            flashFakeAccept('Official record accepted... revoked... accepted again... hold please.');
+                        }
+                        setMessage(state.clickAttempts > 6 ? 'Final review nearly complete. The app is being a menace on purpose.' : 'Final review in progress. Heart status appears extremely stable.');
+                        if (state.clickAttempts >= 12) {
                             yesBtn.removeEventListener('pointerenter', finalChaos);
                             yesBtn.removeEventListener('touchstart', finalChaos);
                             yesBtn.style.transform = 'none';
@@ -888,7 +914,17 @@
                 messageBar.textContent = msg;
             };
 
-            page.setup({ yesBtn, noBtn, card, setMessage });
+            const flashFakeAccept = (msg = 'Accepted... wait, no. Rechecking.') => {
+                yesBtn.classList.add('fake-disabled');
+                noBtn.classList.add('ghosted');
+                setMessage(msg);
+                setTimeout(() => {
+                    yesBtn.classList.remove('fake-disabled');
+                    noBtn.classList.remove('ghosted');
+                }, 420);
+            };
+
+            page.setup({ yesBtn, noBtn, card, setMessage, flashFakeAccept });
 
             yesBtn.addEventListener('click', () => {
                 state.promptsCleared += 1;
