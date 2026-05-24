@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Anniversary!</title>
+    <style>
+        :root {
+            --primary-color: #ff4b5c;
+            --bg-color: #fff5f6;
+            --text-color: #2d3748;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 75, 92, 0.1);
+            width: 100%;
+            max-width: 350px;
+            position: relative;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            position: relative;
+            height: 100px;
+        }
+
+        button {
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-yes {
+            background-color: var(--primary-color);
+            color: white;
+            position: relative;
+            z-index: 10;
+        }
+
+        .btn-no {
+            background-color: #e2e8f0;
+            color: #4a5568;
+            transition: all 0.2s ease;
+        }
+
+        /* Error Overlay Style */
+        .error-toast {
+            position: fixed;
+            top: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            animation: slideDown 0.3s ease forwards;
+            z-index: 100;
+        }
+
+        /* Glitchy Error Page */
+        .error-page {
+            font-family: monospace;
+            background: #1a202c;
+            color: #f7fafc;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .fake-link {
+            color: #ef4444;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="errorToast" class="error-toast">⚠️ Network Error: Selection timeout. Please try again.</div>
+
+    <div id="app-container" class="card">
+        <!-- Content dynamically injected by JS -->
+    </div>
+
+    <script>
+        const state = {
+            currentPage: 1,
+            yesScale: 1.0,
+            clickAttempts: 0,
+            isSwapped: false
+        };
+
+        const pages = {
+            1: {
+                title: "Kristin Egbert, are you still deeply in love with William Egbert?",
+                setup: (btn) => {
+                    const dodge = (e) => {
+                        e.preventDefault();
+                        state.clickAttempts++;
+                        state.yesScale = Math.max(0.4, state.yesScale - 0.15);
+                        btn.style.transform = `scale(${state.yesScale}) translate(${Math.random() * 40 - 20}px, ${Math.random() * 40 - 20}px)`;
+                        
+                        if (state.clickAttempts > 4) {
+                            btn.removeEventListener('touchstart', dodge);
+                            btn.removeEventListener('mouseover', dodge);
+                        }
+                    };
+                    btn.addEventListener('touchstart', dodge, { passive: false });
+                    btn.addEventListener('mouseover', dodge);
+                }
+            },
+            2: {
+                title: "Are you absolutely sure? No second thoughts?",
+                setup: (btn) => {
+                    const teleport = (e) => {
+                        e.preventDefault();
+                        const container = document.querySelector('.card');
+                        const rect = container.getBoundingClientRect();
+                        
+                        const x = Math.random() * (rect.width - 120) - (rect.width/2 - 60);
+                        const y = Math.random() * (rect.height - 160) - (rect.height/2 - 80);
+                        
+                        btn.style.position = 'absolute';
+                        btn.style.left = '50%';
+                        btn.style.top = '50%';
+                        btn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+                    };
+                    btn.addEventListener('touchstart', teleport, { passive: false });
+                    btn.addEventListener('pointerdown', teleport);
+                }
+            },
+            3: {
+                title: "Just to confirm... you love him more today than yesterday?",
+                setup: (btn) => {
+                    const noBtn = document.querySelector('.btn-no');
+                    
+                    const swap = (e) => {
+                        e.preventDefault();
+                        state.clickAttempts++;
+
+                        if (state.clickAttempts > 4) {
+                            btn.removeEventListener('touchstart', swap);
+                            btn.removeEventListener('mouseover', swap);
+                            return;
+                        }
+
+                        if (!state.isSwapped) {
+                            btn.style.transform = 'translateX(110px)';
+                            noBtn.style.transform = 'translateX(-110px)';
+                            state.isSwapped = true;
+                        } else {
+                            btn.style.transform = 'translateX(0)';
+                            noBtn.style.transform = 'translateX(0)';
+                            state.isSwapped = false;
+                        }
+                    };
+                    
+                    btn.addEventListener('touchstart', swap, { passive: false });
+                    btn.addEventListener('mouseover', swap);
+                }
+            },
+            4: {
+                title: "Final verification: Is William the absolute best choice you ever made?",
+                setup: (btn) => {
+                    // Let her click directly to trigger the final fake system error screen
+                }
+            }
+        };
+
+        function showErrorToast(callback) {
+            const toast = document.getElementById('errorToast');
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+                callback();
+            }, 2500);
+        }
+
+        function renderPage(pageNumber) {
+            state.clickAttempts = 0;
+            state.yesScale = 1.0;
+            state.isSwapped = false;
+            
+            if (pageNumber > 4) {
+                renderWinPage();
+                return;
+            }
+
+            const pageData = pages[pageNumber];
+            const container = document.getElementById('app-container');
+            
+            container.innerHTML = `
+                <h1>${pageData.title}</h1>
+                <div class="btn-container">
+                    <button class="btn-yes">YES</button>
+                    <button class="btn-no">No</button>
+                </div>
+            `;
+
+            const yesBtn = container.querySelector('.btn-yes');
+            const noBtn = container.querySelector('.btn-no');
+
+            pageData.setup(yesBtn);
+
+            yesBtn.addEventListener('click', () => {
+                showErrorToast(() => {
+                    state.currentPage++;
+                    renderPage(state.currentPage);
+                });
+            });
+
+            noBtn.addEventListener('click', () => {
+                alert("Wrong answer! Try again. 😉");
+            });
+        }
+
+        function renderWinPage() {
+            document.body.className = "error-page";
+            document.body.innerHTML = `
+                <h1 style="color: #ef4444; font-size: 2rem;">CRITICAL_SYSTEM_ERROR</h1>
+                <p style="margin: 20px 0; max-width: 400px; line-height: 1.6;">
+                    An unhandled exception occurred at entry point 0xLOVE4EVER. The user data for <b>Kristin Egbert</b> has been permanently locked into the status: 
+                    <br><br>
+                    <span style="color: #4ade80; font-size: 1.2rem;">"IN LOVE WITH WILLIAM EGBERT"</span>
+                </p>
+                <p>Please contact your administrator to fix this.</p>
+                <div class="fake-link" id="win-trigger">Click here to attempt automated override and view anniversary card</div>
+            `;
+
+            document.getElementById('win-trigger').addEventListener('click', () => {
+                document.body.className = "";
+                document.body.style.backgroundColor = "#ffe4e6";
+                document.body.innerHTML = `
+                    <div class="card" style="max-width: 450px; animation: slideDown 0.8s ease;">
+                        <h1 style="font-size: 2rem; color: #ff4b5c;">Happy Anniversary, Kristin! ❤️</h1>
+                        <p style="font-size: 1.1rem; line-height: 1.6; color: #4a5568;">
+                            William wins! You admitted it 4 times in a row, even through the glitches. Here's to many more years of chasing your heart (and tricky buttons).
+                        </p>
+                        <span style="font-size: 3rem; margin-top: 20px;">🥂✨🎉</span>
+                    </div>
+                `;
+            });
+        }
+
+        renderPage(state.currentPage);
+    </script>
+</body>
+</html>
