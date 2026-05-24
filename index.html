@@ -626,17 +626,27 @@
                 setup: ({ yesBtn, card, setMessage }) => {
                     const teleport = (event) => {
                         event.preventDefault();
+                        if (state.clickAttempts >= 6) {
+                            yesBtn.removeEventListener('pointerdown', teleport);
+                            yesBtn.removeEventListener('touchstart', teleport);
+                            yesBtn.style.position = 'relative';
+                            yesBtn.style.left = 'auto';
+                            yesBtn.style.top = 'auto';
+                            yesBtn.style.transform = 'none';
+                            setMessage('Alright, alright. The button has stopped running.');
+                            return;
+                        }
                         state.clickAttempts += 1;
                         const cardRect = card.getBoundingClientRect();
-                        const maxX = Math.min(80, cardRect.width * 0.18);
-                        const maxY = Math.min(36, cardRect.height * 0.08);
+                        const maxX = Math.min(150, cardRect.width * 0.34);
+                        const maxY = Math.min(120, cardRect.height * 0.22);
                         const x = Math.random() * maxX * 2 - maxX;
                         const y = Math.random() * maxY * 2 - maxY;
                         yesBtn.style.position = 'absolute';
                         yesBtn.style.left = '50%';
                         yesBtn.style.top = '50%';
                         yesBtn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
-                        setMessage(state.clickAttempts > 2 ? 'The answer keeps running toward destiny.' : 'Please pursue the truth.');
+                        setMessage(state.clickAttempts > 3 ? 'The truth is evasive, but only briefly.' : 'Please pursue the truth.');
                     };
                     yesBtn.addEventListener('pointerdown', teleport);
                     yesBtn.addEventListener('touchstart', teleport, { passive: false });
