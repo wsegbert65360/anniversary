@@ -820,7 +820,106 @@
             },
             {
                 badge: 'Question 6 of 9',
-                title: 'Last one: would you choose William all over again, every single time?',
+                title: 'Last one before the last ones: is William still your favorite human to come home to?',
+                helper: 'This checkpoint exists because the app refuses to end on schedule.',
+                note: 'Domestic happiness scan underway.',
+                yesLabel: 'Obviously',
+                noLabel: 'Needs review',
+                setup: ({ yesBtn, noBtn, setMessage, flashFakeAccept }) => {
+                    const homeShuffle = (event) => {
+                        event.preventDefault();
+                        state.clickAttempts += 1;
+                        const lift = state.clickAttempts % 2 === 0 ? -10 : 8;
+                        const offset = state.clickAttempts % 2 === 0 ? 52 : -52;
+                        yesBtn.style.transform = `translate(${offset}px, ${lift}px) rotate(${offset > 0 ? 5 : -5}deg)`;
+                        noBtn.style.transform = `translate(${-offset}px, ${-lift}px)`;
+                        yesBtn.textContent = state.clickAttempts % 2 === 0 ? 'Still obviously' : 'Obviously';
+                        if (state.clickAttempts === 4 || state.clickAttempts === 8) {
+                            flashFakeAccept('Homecoming happiness confirmed... but the app wants to bask in it a little longer.');
+                        }
+                        setMessage(state.clickAttempts > 5 ? 'Domestic joy levels remain suspiciously high.' : 'Domestic happiness scan underway.');
+                        if (state.clickAttempts >= 10) {
+                            yesBtn.removeEventListener('pointerenter', homeShuffle);
+                            yesBtn.removeEventListener('touchstart', homeShuffle);
+                            yesBtn.style.transform = 'none';
+                            noBtn.style.transform = 'none';
+                            yesBtn.textContent = 'Obviously';
+                            miniBurst(['🏠','💖','✨']);
+                            setMessage('Homecoming joy officially logged.');
+                        }
+                    };
+                    yesBtn.addEventListener('pointerenter', homeShuffle);
+                    yesBtn.addEventListener('touchstart', homeShuffle, { passive: false });
+                }
+            },
+            {
+                badge: 'Question 7 of 9',
+                title: 'If William made you laugh in the middle of an argument, would that still count as winning?',
+                helper: 'This scenario has been reviewed by marriage experts and comedians.',
+                note: 'Tiny emotional loopholes are being examined.',
+                yesLabel: 'Probably yes',
+                noLabel: 'Objection',
+                setup: ({ yesBtn, noBtn, setMessage, flashFakeAccept }) => {
+                    const mirror = (event) => {
+                        event.preventDefault();
+                        state.clickAttempts += 1;
+                        const shift = state.clickAttempts % 2 === 0 ? 82 : -82;
+                        yesBtn.style.transform = `translateX(${shift}px) rotate(${shift > 0 ? 8 : -8}deg)`;
+                        noBtn.style.transform = `translateX(${-shift}px) rotate(${shift > 0 ? -4 : 4}deg)`;
+                        yesBtn.textContent = state.clickAttempts % 2 === 0 ? 'Maybe yes' : 'Probably yes';
+                        if (state.clickAttempts === 4 || state.clickAttempts === 9) {
+                            flashFakeAccept('Humor clause accepted. Wait, legal wants one more review.');
+                        }
+                        setMessage(state.clickAttempts > 6 ? 'This argument is not surviving the charm factor.' : 'Comedic interference detected.');
+                        if (state.clickAttempts >= 11) {
+                            yesBtn.removeEventListener('pointerenter', mirror);
+                            yesBtn.removeEventListener('touchstart', mirror);
+                            yesBtn.style.transform = 'none';
+                            noBtn.style.transform = 'none';
+                            yesBtn.textContent = 'Probably yes';
+                            miniBurst(['😂','💘','✨']);
+                            setMessage('Charm advantage officially recorded.');
+                        }
+                    };
+                    yesBtn.addEventListener('pointerenter', mirror);
+                    yesBtn.addEventListener('touchstart', mirror, { passive: false });
+                }
+            },
+            {
+                badge: 'Question 8 of 9',
+                title: 'Would you still pick William even if this app kept being extra for no reason at all?',
+                helper: 'Be honest. It knows what it is doing.',
+                note: 'You are now negotiating directly with nonsense.',
+                yesLabel: 'Still yes',
+                noLabel: 'App, behave',
+                setup: ({ yesBtn, setMessage, flashFakeAccept }) => {
+                    const spiral = (event) => {
+                        event.preventDefault();
+                        state.clickAttempts += 1;
+                        const angle = state.clickAttempts * 22;
+                        const scale = 1 + ((state.clickAttempts % 3) * 0.06);
+                        yesBtn.style.transform = `rotate(${angle}deg) scale(${scale})`;
+                        yesBtn.textContent = state.clickAttempts % 3 === 0 ? 'Obviously yes' : 'Still yes';
+                        if (state.clickAttempts === 3 || state.clickAttempts === 7) {
+                            flashFakeAccept('App self-awareness spike detected. Retrying.');
+                        }
+                        setMessage(state.clickAttempts > 5 ? 'The app heard that and got even more dramatic.' : 'You are now negotiating directly with nonsense.');
+                        if (state.clickAttempts >= 10) {
+                            yesBtn.removeEventListener('pointerenter', spiral);
+                            yesBtn.removeEventListener('touchstart', spiral);
+                            yesBtn.style.transform = 'none';
+                            yesBtn.textContent = 'Still yes';
+                            miniBurst(['🤪','💖','✨']);
+                            setMessage('Nonsense level capped. Continue.');
+                        }
+                    };
+                    yesBtn.addEventListener('pointerenter', spiral);
+                    yesBtn.addEventListener('touchstart', spiral, { passive: false });
+                }
+            },
+            {
+                badge: 'Final question',
+                title: 'Last last question: would you choose William all over again, every single time?',
                 helper: 'This is the big finish. The app is already pretty sure, but it wants the official record.',
                 note: 'Final answer. Maximum romance pressure.',
                 yesLabel: 'Every time',
@@ -829,18 +928,20 @@
                     const finalChaos = (event) => {
                         event.preventDefault();
                         state.clickAttempts += 1;
-                        const offset = state.clickAttempts % 2 === 0 ? 60 : -60;
+                        const offset = state.clickAttempts % 2 === 0 ? 74 : -74;
                         yesBtn.style.transform = `translateY(-6px) translateX(${offset}px) rotate(${offset > 0 ? 6 : -6}deg)`;
                         noBtn.style.transform = `translateX(${-offset}px)`;
-                        if (state.clickAttempts === 5 || state.clickAttempts === 10) {
+                        yesBtn.textContent = state.clickAttempts % 3 === 0 ? 'Still every time' : 'Every time';
+                        if (state.clickAttempts === 5 || state.clickAttempts === 10 || state.clickAttempts === 13) {
                             flashFakeAccept('Official record accepted... revoked... accepted again... hold please.');
                         }
-                        setMessage(state.clickAttempts > 6 ? 'Final review nearly complete. The app is being a menace on purpose.' : 'Final review in progress. Heart status appears extremely stable.');
-                        if (state.clickAttempts >= 12) {
+                        setMessage(state.clickAttempts > 7 ? 'Final review nearly complete. The app is being a menace on purpose.' : 'Final review in progress. Heart status appears extremely stable.');
+                        if (state.clickAttempts >= 15) {
                             yesBtn.removeEventListener('pointerenter', finalChaos);
                             yesBtn.removeEventListener('touchstart', finalChaos);
                             yesBtn.style.transform = 'none';
                             noBtn.style.transform = 'none';
+                            yesBtn.textContent = 'Every time';
                             miniBurst(['🥹','💍','💖','✨']);
                             setMessage('Official record accepted. Proceed with romance.');
                         }
@@ -895,7 +996,7 @@
                     </div>
                     <div class="question-card">
                         <div class="question-badge">Before we begin</div>
-                        <div class="question-text">This app contains four questions, one dramatic fake error, and a very predictable outcome.</div>
+                        <div class="question-text">This app contains nine questions, one dramatic fake error, and a very predictable outcome.</div>
                         <p class="helper-text">If you are Kristin, please continue. If you are William, you probably already know how this ends.</p>
                     </div>
                     <div style="display:flex; justify-content:center; margin-top: 8px;">
