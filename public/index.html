@@ -591,7 +591,9 @@
                 'Hmm. That answer looked suspicious. Retrying love verification...',
                 'Rechecking emotional honesty, please hold 💘',
                 'System note: true love confirmed, but we need one more tap.',
-                'Tiny glitch. Huge feelings. Continuing...'
+                'Tiny glitch. Huge feelings. Continuing...',
+                'Romance sensors overloaded. Running another check...',
+                'That looked correct, but the app is being dramatic about it.'
             ]
         };
 
@@ -632,7 +634,7 @@
                 setup: ({ yesBtn, card, setMessage }) => {
                     const teleport = (event) => {
                         event.preventDefault();
-                        if (state.clickAttempts >= 6) {
+                        if (state.clickAttempts >= 10) {
                             yesBtn.removeEventListener('pointerdown', teleport);
                             yesBtn.removeEventListener('touchstart', teleport);
                             yesBtn.style.position = 'relative';
@@ -644,15 +646,17 @@
                         }
                         state.clickAttempts += 1;
                         const cardRect = card.getBoundingClientRect();
-                        const maxX = Math.min(150, cardRect.width * 0.34);
-                        const maxY = Math.min(120, cardRect.height * 0.22);
+                        const maxX = Math.min(180, cardRect.width * 0.4);
+                        const maxY = Math.min(150, cardRect.height * 0.28);
                         const x = Math.random() * maxX * 2 - maxX;
                         const y = Math.random() * maxY * 2 - maxY;
+                        const rotate = Math.random() * 18 - 9;
+                        const scale = 0.92 + Math.random() * 0.18;
                         yesBtn.style.position = 'absolute';
                         yesBtn.style.left = '50%';
                         yesBtn.style.top = '50%';
-                        yesBtn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
-                        setMessage(state.clickAttempts > 3 ? 'The truth is evasive, but only briefly.' : 'Please pursue the truth.');
+                        yesBtn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${rotate}deg) scale(${scale})`;
+                        setMessage(state.clickAttempts > 5 ? 'The truth is evasive, but only temporarily.' : 'Please pursue the truth.');
                     };
                     yesBtn.addEventListener('pointerdown', teleport);
                     yesBtn.addEventListener('touchstart', teleport, { passive: false });
@@ -670,12 +674,15 @@
                         event.preventDefault();
                         state.clickAttempts += 1;
                         state.isSwapped = !state.isSwapped;
-                        yesBtn.style.transform = state.isSwapped ? 'translateX(90px)' : 'translateX(0)';
-                        noBtn.style.transform = state.isSwapped ? 'translateX(-90px)' : 'translateX(0)';
-                        setMessage(state.isSwapped ? 'Those feelings have range.' : 'Love metrics stabilizing.');
-                        if (state.clickAttempts >= 5) {
+                        const distance = state.isSwapped ? 118 : 0;
+                        yesBtn.style.transform = state.isSwapped ? `translateX(${distance}px) rotate(6deg)` : 'translateX(0) rotate(0deg)';
+                        noBtn.style.transform = state.isSwapped ? `translateX(-${distance}px) rotate(-6deg)` : 'translateX(0) rotate(0deg)';
+                        yesBtn.textContent = state.isSwapped ? 'Catch me' : 'Even more';
+                        setMessage(state.isSwapped ? 'Those feelings have range.' : 'Love metrics destabilized again.');
+                        if (state.clickAttempts >= 8) {
                             yesBtn.removeEventListener('pointerenter', swap);
                             yesBtn.removeEventListener('touchstart', swap);
+                            yesBtn.textContent = 'Even more';
                             setMessage('The buttons are done being dramatic.');
                         }
                     };
@@ -690,8 +697,23 @@
                 note: 'Proceed only if you are prepared for romance-themed system instability.',
                 yesLabel: 'Without question',
                 noLabel: 'I plead the fifth',
-                setup: ({ setMessage }) => {
-                    setMessage('Warning: choosing correctly may unlock celebration mode.');
+                setup: ({ yesBtn, setMessage }) => {
+                    const pulseAway = (event) => {
+                        event.preventDefault();
+                        state.clickAttempts += 1;
+                        const scale = state.clickAttempts % 2 === 0 ? 0.88 : 1.08;
+                        const rotate = state.clickAttempts % 2 === 0 ? -5 : 5;
+                        yesBtn.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
+                        setMessage(state.clickAttempts > 4 ? 'The answer is obvious, the app is just milking it.' : 'Warning: choosing correctly may unlock celebration mode.');
+                        if (state.clickAttempts >= 7) {
+                            yesBtn.removeEventListener('pointerenter', pulseAway);
+                            yesBtn.removeEventListener('touchstart', pulseAway);
+                            yesBtn.style.transform = 'none';
+                            setMessage('Celebration mode can no longer be delayed.');
+                        }
+                    };
+                    yesBtn.addEventListener('pointerenter', pulseAway);
+                    yesBtn.addEventListener('touchstart', pulseAway, { passive: false });
                 }
 
             },
@@ -706,13 +728,16 @@
                     const tilt = (event) => {
                         event.preventDefault();
                         state.clickAttempts += 1;
-                        const rotate = state.clickAttempts % 2 === 0 ? -6 : 6;
-                        yesBtn.style.transform = `rotate(${rotate}deg) scale(1.02)`;
-                        setMessage(state.clickAttempts > 2 ? 'Marriage audit suggests forgiveness is likely.' : 'Domestic negotiations detected.');
-                        if (state.clickAttempts >= 4) {
+                        const rotate = state.clickAttempts % 3 === 0 ? -10 : 10;
+                        const shift = state.clickAttempts % 2 === 0 ? -26 : 26;
+                        yesBtn.style.transform = `translateX(${shift}px) rotate(${rotate}deg) scale(1.03)`;
+                        yesBtn.textContent = state.clickAttempts % 2 === 0 ? 'Still him' : 'Keep him';
+                        setMessage(state.clickAttempts > 4 ? 'Marriage audit suggests forgiveness is extremely likely.' : 'Domestic negotiations detected.');
+                        if (state.clickAttempts >= 7) {
                             yesBtn.removeEventListener('pointerenter', tilt);
                             yesBtn.removeEventListener('touchstart', tilt);
-                            yesBtn.style.transform = 'rotate(0deg)';
+                            yesBtn.style.transform = 'none';
+                            yesBtn.textContent = 'Keep him';
                             setMessage('Compromise reached. Proceed.');
                         }
                     };
@@ -727,8 +752,24 @@
                 note: 'Final answer. Maximum romance pressure.',
                 yesLabel: 'Every time',
                 noLabel: 'This seems rigged',
-                setup: ({ setMessage }) => {
-                    setMessage('Final review in progress. Heart status appears extremely stable.');
+                setup: ({ yesBtn, noBtn, setMessage }) => {
+                    const finalChaos = (event) => {
+                        event.preventDefault();
+                        state.clickAttempts += 1;
+                        const offset = state.clickAttempts % 2 === 0 ? 60 : -60;
+                        yesBtn.style.transform = `translateY(-6px) translateX(${offset}px) rotate(${offset > 0 ? 6 : -6}deg)`;
+                        noBtn.style.transform = `translateX(${-offset}px)`;
+                        setMessage(state.clickAttempts > 5 ? 'Final review nearly complete. The app is being a menace on purpose.' : 'Final review in progress. Heart status appears extremely stable.');
+                        if (state.clickAttempts >= 9) {
+                            yesBtn.removeEventListener('pointerenter', finalChaos);
+                            yesBtn.removeEventListener('touchstart', finalChaos);
+                            yesBtn.style.transform = 'none';
+                            noBtn.style.transform = 'none';
+                            setMessage('Official record accepted. Proceed with romance.');
+                        }
+                    };
+                    yesBtn.addEventListener('pointerenter', finalChaos);
+                    yesBtn.addEventListener('touchstart', finalChaos, { passive: false });
                 }
             }
         ];
